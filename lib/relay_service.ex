@@ -1,5 +1,5 @@
 defmodule RelayService do
-  @moduledoc "The main OTP application for HelloWebhook"
+  @moduledoc "The main OTP application for RelayService"
 
   use Application
 
