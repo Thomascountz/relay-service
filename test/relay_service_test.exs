@@ -1,14 +1,14 @@
-defmodule HelloWebhookTest do
+defmodule RelayServiceTest do
   use ExUnit.Case, async: true
   use Plug.Test
 
-  doctest HelloWebhook
+  doctest RelayService
 
-  @opts HelloWebhook.Endpoint.init([])
+  @opts RelayService.Endpoint.init([])
 
   test "GET /hello" do
     conn = conn(:get, "/hello")
-    conn = HelloWebhook.Endpoint.call(conn, @opts)
+    conn = RelayService.Endpoint.call(conn, @opts)
 
     assert conn.state == :sent
     assert conn.status == 200
@@ -22,7 +22,7 @@ defmodule HelloWebhookTest do
       conn(:post, "hello", body)
       |> put_req_header("content-type", "application/json")
 
-    conn = HelloWebhook.Endpoint.call(conn, @opts)
+    conn = RelayService.Endpoint.call(conn, @opts)
 
     assert conn.state == :sent
     assert conn.status == 200
@@ -31,7 +31,7 @@ defmodule HelloWebhookTest do
 
   test "POST /hello without a name" do
     conn = conn(:post, "hello")
-    conn = HelloWebhook.Endpoint.call(conn, @opts)
+    conn = RelayService.Endpoint.call(conn, @opts)
     assert conn.state == :sent
     assert conn.status == 422
     assert conn.resp_body == Poison.encode!(%{error: "Expected a \"name\" key"})
