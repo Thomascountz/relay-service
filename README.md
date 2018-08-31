@@ -4,5 +4,5 @@
 
 ## Usage
 
-** TODO: Add useage**
+**TODO: Add usage**
 
