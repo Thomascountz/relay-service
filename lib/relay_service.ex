@@ -1,4 +1,4 @@
-defmodule HelloWebhook do
+defmodule RelayService do
   @moduledoc "The main OTP application for HelloWebhook"
 
   use Application
@@ -7,7 +7,7 @@ defmodule HelloWebhook do
     import Supervisor.Spec, warn: false
 
     children = [
-      worker(HelloWebhook.Endpoint, [])
+      worker(RelayService.Endpoint, [])
     ]
 
     opts = [strategy: :one_for_one, name: HexVersion.Supervisor]

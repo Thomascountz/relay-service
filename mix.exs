@@ -1,9 +1,9 @@
-defmodule HelloWebhook.MixProject do
+defmodule RelayService.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :hello_webhook,
+      app: :relay_service,
       version: "0.1.0",
       elixir: "~> 1.5",
       build_embedded: Mix.env() == :prod,
@@ -16,7 +16,7 @@ defmodule HelloWebhook.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {HelloWebhook, []}
+      mod: {RelayService, []}
     ]
   end
 

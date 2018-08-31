@@ -1,4 +1,4 @@
-defmodule HelloWebhook.Endpoint do
+defmodule RelayService.Endpoint do
   use Plug.Router
   require Logger
 
@@ -12,7 +12,7 @@ defmodule HelloWebhook.Endpoint do
   end
 
   def start_link do
-    port = Application.fetch_env!(:hello_webhook, :port)
+    port = Application.fetch_env!(:relay_service, :port)
     {:ok, _} = Plug.Adapters.Cowboy.http(__MODULE__, [], port: port)
   end
 

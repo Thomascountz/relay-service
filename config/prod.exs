@@ -6,4 +6,4 @@ port =
     nil -> 80
   end
 
-config :hello_webhook, port: port
+config :relay_service, port: port

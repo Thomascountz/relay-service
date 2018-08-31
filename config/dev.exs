@@ -1,3 +1,3 @@
 use Mix.Config
 
-config :hello_webhook, port: 4000
+config :relay_service, port: 4000
