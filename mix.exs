@@ -25,7 +25,8 @@ defmodule RelayService.MixProject do
     [
       {:cowboy, "~> 1.1"},
       {:plug, "~> 1.3"},
-      {:poison, "~> 3.0"}
+      {:poison, "~> 3.0"},
+      {:mix_test_watch, "~> 0.8", only: :dev, runtime: false}
     ]
   end
 end
