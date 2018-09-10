@@ -28,7 +28,7 @@ defmodule RelayService.SentimentTest do
                       request_url: "http://localhost",
                       status_code: 200
                     }}
-  @error_response {:error, "Something went wrong."}
+  @error_response {:error, %HTTPoison.Error{id: nil, reason: :econnrefused}}
 
   test "analyze/2 calls HTTPoison to make an NPL analysis request" do
     with_mock(HTTPoison, post: fn _url, _body, _headers, _options -> @joyous_response end) do
@@ -69,6 +69,15 @@ defmodule RelayService.SentimentTest do
   test "analyze/2 returns an :error tuple when the request is unsuccessful" do
     with_mock(HTTPoison, post: fn _url, _body, _headers, _options -> @error_response end) do
       assert {:error, _} = RelayService.Sentiment.analyze("Lorem Ipsum")
+    end
+  end
+
+  test "analyze/2 returns an error reason when the request is unsuccessful" do
+    expected_error_response = :econnrefused
+
+    with_mock(HTTPoison, post: fn _url, _body, _headers, _options -> @error_response end) do
+      {:error, reason} = RelayService.Sentiment.analyze("Lorem Ipsum")
+      assert reason == expected_error_response
     end
   end
 end

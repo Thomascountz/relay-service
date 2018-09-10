@@ -8,7 +8,7 @@ defmodule RelayService.Sentiment do
     case sentiment_analysis_service_url()
          |> HTTPoison.post(encode_text(text), headers(), options()) do
       {:ok, response} -> {:ok, response.body}
-      {:error, reason} -> {:error, reason}
+      {:error, error} -> {:error, error.reason}
     end
   end
 
