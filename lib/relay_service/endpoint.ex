@@ -30,6 +30,15 @@ defmodule RelayService.Endpoint do
     send_resp(conn, status, body)
   end
 
+  get "/sentiment/analyze" do
+    {_, body} =
+      conn.query_params
+      |> Map.fetch!("text")
+      |> RelayService.Sentiment.analyze()
+
+    send_resp(conn, 200, body)
+  end
+
   defp say_hello(name) do
     Poison.encode!(%{response: "Hello, #{name}!"})
   end
