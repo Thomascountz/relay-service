@@ -7,3 +7,6 @@ port =
   end
 
 config :relay_service, port: port
+
+config :relay_service,
+  ibm_watson_tone_analyzer_key: System.get_env("IBM_WATSON_TONE_ANALYZER_KEY")
