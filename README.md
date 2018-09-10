@@ -3,11 +3,17 @@
 
 API endpoint for [Relay Text Editor's NPL Analysis](https://github.com/Thomascountz/relay)
 
+### STAGING
 ```
 https://frozen-hollows-25947.herokuapp.com
 ```
 
-Endpoints
+### PRODUCTION
+```
+https://relay-service.herokuapp.com
+```
+
+Production Endpoints
 
 ```
 GET /hello
