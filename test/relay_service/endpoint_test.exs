@@ -59,4 +59,30 @@ defmodule RelayServiceTest do
                "{\"document_tone\":{\"tones\":[]},\"sentences_tone\":[{\"sentence_id\":0,\"text\":\"Lorem ipsum dolor sit amet, consectetur adipiscing elit.\",\"tones\":[]},{\"sentence_id\":1,\"text\":\"Ut fermentum ultrices scelerisque.\",\"tones\":[]},{\"sentence_id\":2,\"text\":\"Mauris fringilla massa sed ante semper placerat.\",\"tones\":[]}]}"
     end
   end
+
+  test "GET /sentiment/analyze without text query params" do
+    endpoint = "sentiment/analyze?foo=foo"
+
+    conn = conn(:get, endpoint)
+    conn = RelayService.Endpoint.call(conn, @opts)
+
+    assert conn.state == :sent
+    assert conn.status == 400
+  end
+
+  test "GET /sentiment/analyze http error" do
+    endpoint = "sentiment/analyze?text=Lorem%20Ipsum"
+
+    with_mock(RelayService.Sentiment,
+      analyze: fn _ ->
+        {:error, :econnrefused}
+      end
+    ) do
+      conn = conn(:get, endpoint)
+      conn = RelayService.Endpoint.call(conn, @opts)
+
+      assert conn.state == :sent
+      assert conn.status == 500
+    end
+  end
 end

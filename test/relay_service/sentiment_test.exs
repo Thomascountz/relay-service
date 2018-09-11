@@ -28,9 +28,23 @@ defmodule RelayService.SentimentTest do
                       request_url: "http://localhost",
                       status_code: 200
                     }}
-  @error_response {:error, %HTTPoison.Error{id: nil, reason: :econnrefused}}
+  @request_error_response {:error, %HTTPoison.Error{id: nil, reason: :econnrefused}}
+  @api_401_response {:ok,
+                     %HTTPoison.Response{
+                       body: "{\"code\":401, \"error\": \"Unauthorized\"}",
+                       headers: [
+                         {"Date", "Tue, 11 Sep 2018 14:34:29 GMT"},
+                         {"Content-Type", "application/json"},
+                         {"Content-Length", "37"},
+                         {"Connection", "keep-alive"},
+                         {"Www-Authenticate", "Basic realm=\"IBM Watson Gateway(Log-in)\""}
+                       ],
+                       request_url:
+                         "https://gateway-wdc.watsonplatform.net/tone-analyzer/api/v3/tone?version=2017-09-21",
+                       status_code: 401
+                     }}
 
-  test "analyze/2 calls HTTPoison to make an NPL analysis request" do
+  test "analyze/1 calls HTTPoison to make an NPL analysis request" do
     with_mock(HTTPoison, post: fn _url, _body, _headers, _options -> @joyous_response end) do
       url = RelayService.Sentiment.sentiment_analysis_service_url()
       encoded_text = "{\"text\":\"#{@joyous_text}\"}"
@@ -50,13 +64,13 @@ defmodule RelayService.SentimentTest do
     end
   end
 
-  test "analyze/2 returns an :ok tuple when request is successful" do
+  test "analyze/1 returns an :ok tuple when request is successful" do
     with_mock(HTTPoison, post: fn _url, _body, _headers, _options -> @joyous_response end) do
       assert {:ok, _} = RelayService.Sentiment.analyze(@joyous_text)
     end
   end
 
-  test "analyze/2 returns the result body as json when request is successful" do
+  test "analyze/1 returns the result body as json when request is successful" do
     expected_response =
       "{\"document_tone\":{\"tones\":[{\"score\":0.930452,\"tone_id\":\"joy\",\"tone_name\":\"Joy\"}]},\"sentences_tone\":[{\"sentence_id\":0,\"text\":\"I love this time of year!\",\"tones\":[{\"score\":0.832088,\"tone_id\":\"joy\",\"tone_name\":\"Joy\"}]},{\"sentence_id\":1,\"text\":\"The leaves begin to change, and I enjoy many cups of tea!\",\"tones\":[{\"score\":0.90188,\"tone_id\":\"joy\",\"tone_name\":\"Joy\"}]}]}"
 
@@ -66,16 +80,22 @@ defmodule RelayService.SentimentTest do
     end
   end
 
-  test "analyze/2 returns an :error tuple when the request is unsuccessful" do
-    with_mock(HTTPoison, post: fn _url, _body, _headers, _options -> @error_response end) do
+  test "analyze/1 returns an :error tuple when the request is unsuccessful" do
+    with_mock(HTTPoison, post: fn _url, _body, _headers, _options -> @request_error_response end) do
       assert {:error, _} = RelayService.Sentiment.analyze("Lorem Ipsum")
     end
   end
 
-  test "analyze/2 returns an error reason when the request is unsuccessful" do
+  test "analyze/1 returns an :error tuple when the api returns a non-200 status code" do
+    with_mock(HTTPoison, post: fn _url, _body, _headers, _options -> @api_401_response end) do
+      assert {:error, _} = RelayService.Sentiment.analyze("Lorem Ipsum")
+    end
+  end
+
+  test "analyze/1 returns an error reason when the request is unsuccessful" do
     expected_error_response = :econnrefused
 
-    with_mock(HTTPoison, post: fn _url, _body, _headers, _options -> @error_response end) do
+    with_mock(HTTPoison, post: fn _url, _body, _headers, _options -> @request_error_response end) do
       {:error, reason} = RelayService.Sentiment.analyze("Lorem Ipsum")
       assert reason == expected_error_response
     end

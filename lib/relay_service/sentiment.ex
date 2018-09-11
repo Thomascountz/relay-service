@@ -5,10 +5,15 @@ defmodule RelayService.Sentiment do
   def sentiment_analysis_service_url, do: @sentiment_analysis_service_url
 
   def analyze(text) do
-    case sentiment_analysis_service_url()
-         |> HTTPoison.post(encode_text(text), headers(), options()) do
-      {:ok, response} -> {:ok, response.body}
-      {:error, error} -> {:error, error.reason}
+    case HTTPoison.post(sentiment_analysis_service_url(), encode_text(text), headers(), options()) do
+      {:ok, response} ->
+        case response.status_code do
+          200 -> {:ok, response.body}
+          _ -> {:error, response.body}
+        end
+
+      {:error, error} ->
+        {:error, error.reason}
     end
   end
 
