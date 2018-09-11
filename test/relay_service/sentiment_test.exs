@@ -2,6 +2,16 @@ defmodule RelayService.SentimentTest do
   use ExUnit.Case
   import Mock
 
+  @sentiment_analysis_service_url Application.fetch_env!(
+                                    :relay_service,
+                                    :ibm_watson_tone_analyzer_url
+                                  )
+
+  @sentiment_analysis_service_key Application.fetch_env!(
+                                    :relay_service,
+                                    :ibm_watson_tone_analyzer_key
+                                  )
+
   @joyous_text "I love this time of year! The leaves begin to change, and I enjoy many cups of tea!"
   @joyous_response {:ok,
                     %HTTPoison.Response{
@@ -46,10 +56,10 @@ defmodule RelayService.SentimentTest do
 
   test "analyze/1 calls HTTPoison to make an NPL analysis request" do
     with_mock(HTTPoison, post: fn _url, _body, _headers, _options -> @joyous_response end) do
-      url = RelayService.Sentiment.sentiment_analysis_service_url()
+      url = @sentiment_analysis_service_url
       encoded_text = "{\"text\":\"#{@joyous_text}\"}"
       headers = [{"Content-Type", "application/json"}]
-      options = [hackney: [basic_auth: {"apikey", "api-key"}]]
+      options = [hackney: [basic_auth: {"apikey", @sentiment_analysis_service_key}]]
 
       RelayService.Sentiment.analyze(@joyous_text)
 
