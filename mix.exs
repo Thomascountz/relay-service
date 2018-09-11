@@ -15,7 +15,8 @@ defmodule RelayService.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
+      applications: [:httpoison],
+      extra_applications: [:logger, :plug],
       mod: {RelayService, []}
     ]
   end
@@ -25,7 +26,10 @@ defmodule RelayService.MixProject do
     [
       {:cowboy, "~> 1.1"},
       {:plug, "~> 1.3"},
-      {:poison, "~> 3.0"}
+      {:poison, "~> 3.0"},
+      {:httpoison, "~> 1.3"},
+      {:mix_test_watch, "~> 0.8", only: :dev, runtime: false},
+      {:mock, "~> 0.3.0", only: :test}
     ]
   end
 end
