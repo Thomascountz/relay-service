@@ -31,20 +31,23 @@ defmodule RelayService.Endpoint do
   end
 
   get "/sentiment/analyze" do
-    case conn.query_params |> Map.fetch("text") do
-      {:ok, text} ->
-        case RelayService.Sentiment.analyze(text) do
-          {:ok, analysis} ->
-            send_resp(conn, 200, analysis)
+    {status, body} =
+      case conn.query_params |> Map.fetch("text") do
+        {:ok, text} -> analyze_sentiment(text)
+        _ -> {400, bad_request()}
+      end
 
-          {:error, response} ->
-            Logger.warn("API returned a non-200: #{response}")
-            send_resp(conn, 500, internal_server_error())
-        end
+    send_resp(conn, status, body)
+  end
 
-      :error ->
-        send_resp(conn, 400, bad_request())
-    end
+  post "/sentiment/analyze" do
+    {status, body} =
+      case conn.body_params do
+        %{"text" => text} -> analyze_sentiment(text)
+        _ -> {400, bad_request()}
+      end
+
+    send_resp(conn, status, body)
   end
 
   defp say_hello(name) do
@@ -53,6 +56,17 @@ defmodule RelayService.Endpoint do
 
   defp missing_name do
     Poison.encode!(%{error: "Expected a \"name\" key"})
+  end
+
+  defp analyze_sentiment(text) do
+    case RelayService.Sentiment.analyze(text) do
+      {:ok, analysis} ->
+        {200, analysis}
+
+      {:error, reason} ->
+        Logger.warn("API returned a non-200: #{reason}")
+        {500, internal_server_error()}
+    end
   end
 
   defp bad_request do
