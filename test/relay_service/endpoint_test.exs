@@ -84,4 +84,57 @@ defmodule RelayServiceTest do
       assert conn.status == 500
     end
   end
+
+  test "POST /sentiment/analyze" do
+    endpoint = "sentiment/analyze"
+    body = "{\"text\":\"Lorem ipsum\"}"
+
+    with_mock(RelayService.Sentiment,
+      analyze: fn _ ->
+        {:ok,
+         "{\"document_tone\":{\"tones\":[]},\"sentences_tone\":[{\"sentence_id\":0,\"text\":\"Lorem ipsum\",\"tones\":[]}]}"}
+      end
+    ) do
+      conn =
+        conn(:post, endpoint, body)
+        |> put_req_header("content-type", "application/json")
+
+      conn = RelayService.Endpoint.call(conn, @opts)
+
+      assert conn.resp_body ==
+               "{\"document_tone\":{\"tones\":[]},\"sentences_tone\":[{\"sentence_id\":0,\"text\":\"Lorem ipsum\",\"tones\":[]}]}"
+    end
+  end
+
+  test "POST /sentiment/analyze with invalid payload" do
+    endpoint = "sentiment/analyze"
+    body = "foo"
+
+    conn = conn(:post, endpoint, body)
+
+    conn = RelayService.Endpoint.call(conn, @opts)
+
+    assert conn.state == :sent
+    assert conn.status == 400
+  end
+
+  test "POST /sentiment/analyze http error" do
+    endpoint = "sentiment/analyze"
+    body = "{\"text\":\"Lorem ipsum\"}"
+
+    with_mock(RelayService.Sentiment,
+      analyze: fn _ ->
+        {:error, :econnrefused}
+      end
+    ) do
+      conn =
+        conn(:post, endpoint, body)
+        |> put_req_header("content-type", "application/json")
+
+      conn = RelayService.Endpoint.call(conn, @opts)
+
+      assert conn.state == :sent
+      assert conn.status == 500
+    end
+  end
 end
