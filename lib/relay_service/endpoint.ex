@@ -7,6 +7,10 @@ defmodule RelayService.Endpoint do
   plug(:match)
   plug(:dispatch)
 
+  if :prod == Application.fetch_env!(:relay_service, :env) do
+    plug(Plug.SSL)
+  end
+
   def init(options) do
     options
   end
