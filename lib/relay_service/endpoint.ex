@@ -3,13 +3,14 @@ defmodule RelayService.Endpoint do
   require Logger
 
   plug(Plug.Logger)
-  plug(Plug.Parsers, parsers: [:json], json_decoder: Poison)
-  plug(:match)
-  plug(:dispatch)
 
   if :prod == Application.fetch_env!(:relay_service, :env) do
     plug(Plug.SSL)
   end
+
+  plug(Plug.Parsers, parsers: [:json], json_decoder: Poison)
+  plug(:match)
+  plug(:dispatch)
 
   def init(options) do
     options
