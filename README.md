@@ -203,3 +203,6 @@ $ git push heroku master
 $ heroku config:set IBM_WATSON_TONE_ANALYZER_KEY=<YOUR API KEY>
 $ heroku config:set IBM_WATSON_TONE_ANALYZER_URL=<YOUR WATSON TONE ANALYZER URL>
 ```
+
+### Issues and Bug Tracking
+https://github.com/Thomascountz/relay-service/issues
